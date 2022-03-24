@@ -1,7 +1,7 @@
 <template>
   <div :style='{width:width}' class="datetime-picker"  v-on:click='calendarClicked($event)'  v-on:blur='toggleCal' >
     <div>
-      <input type='text' :readonly="readonly" id='tj-datetime-input' :required="required" :value="date"  :name='name' v-on:click='toggleCal' autocomplete='off'  />
+      <input type='text' :readonly="readonly" :class="errorClass" id='tj-datetime-input' :required="required" :value="date"  :name='name' v-on:click='toggleCal' autocomplete='off'  />
       <div class='calender-div' :class='{noDisplay: hideCal}'>
         <div :class='{noDisplay: hideDate}'>
           <div class='year-month-wrapper'>
@@ -82,6 +82,9 @@ export default {
       default: 'YYYY-MM-DD h:i:s',
     },
     name: {
+      type: String
+    },
+    errorClass: {
       type: String
     },
     width: {
@@ -318,14 +321,14 @@ export default {
       }
       d = this.dateFormat
       d = d.replace('YYYY', this.year)
-      d = d.replace('DD', this.day < 10 ? '0' + this.day : this.day)
-      let m = this.monthIndex + 1
-      d = d.replace('MM', m < 10 ? '0' + m : m)
+      d = d.replace('DD/', this.day < 10 ? '0' + this.day + ', ' : this.day + ', ')
+      let m = this.monthIndex
+      d = d.replace('MM/', this.months[m] + ' ')
       this.minute += ''
       d = d.replace(this.periodStyle === 24 ? 'H' : 'h', h.length < 2 ? '0' + h : '' + h )
       d = d.replace('i', this.minute.length < 2 ? '0' + this.minute : '' + this.minute)
       d = d.replace('s', '00')
-      this.$emit('input', d)
+      this.$emit('inputs', d)
       this.date = d
       this.hideCal = true
     },
@@ -380,7 +383,7 @@ export default {
     },
     clearDate(){
       this.date = ''
-      this.$emit('input', '')
+      this.$emit('inputs', ' ')
       this.toggleCal ()
     },
   },
@@ -533,21 +536,39 @@ export default {
 <style scoped>
 
   .year-month-wrapper{
-    background-color: #ed4d00;
+   background-image: linear-gradient(to left, #a74b11, #0c5078);;
   }
 
   input{
-    min-width: 226px;
-    width:100%;
-    height: 30px;
-    padding: 3px;
-    border: 1px solid #ddd;
+    min-width: 340px;
+    height: 35px;
+  border: 0.5px solid #0c5078;
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+  font-family: poppins;
+  font-weight: 500;
   }
+
+  input.error{  
+  border: 2px solid #b53737;
+  }
+
+
+@media (max-width: 969px)
+{
+  input{
+    min-width: 20vh;
+    width: 30vh;
+  }
+}
+
   .datetime-picker{
     position: relative;
   }
   .calender-div{
-    min-width: 270px;
+    min-width: 285px;
     box-shadow: 1px 2px 5px #ccc;
     background: #FFF;
     position: absolute;
@@ -571,15 +592,15 @@ export default {
     cursor: pointer;
   }
   .days{
-    color: #ed4d00;
+    color: #0c5078;
     font-weight: bold;
   }
   .port:hover{
-    color: #ed4d00;
+    color: #09421d;
     font-weight: bold;
   }
   .activePort, .activePort:hover {
-    background-color: #ed4d00;
+  background: #0c5078;
     color: white;
   }
   .month-setter, .year-setter{
@@ -590,12 +611,12 @@ export default {
     display: inline-block;
   }
   .nav-l:hover, .nav-r:hover {
-    background-color: #dc3c00;
+    background-color: #0c5078;
   }
   .nav-l, .nav-r {
     display: inline-block;
     width: 25px;
-    background-color: #ed4d00;
+    background-color: transparent;
     color: white;
     font-size: 16px;
     cursor: pointer;
@@ -613,8 +634,8 @@ export default {
     float: right;
   }
   .month, .year{
-    width: 40px;
-    text-align: right;
+    width: 60%;
+    text-align: center;
     display: inline-block;
     color: white;
     padding: 7px 0;
@@ -633,9 +654,10 @@ export default {
   .time-separator{
     display: inline-block;
     font-weight: bold;
+     margin: 0px 10px 0px 10px;
   }
   .time-picker{
-    margin: 10px
+    margin: 10px;
   }
   .nav-t, .nav-d{
     font-weight: bold;
@@ -666,7 +688,7 @@ export default {
     display:inline-block;
   }
   li.active{
-    background-color: #ed4d00;
+    background-color: #0c5078;
     color: white;
   }
   li{
@@ -682,7 +704,7 @@ export default {
     display: none;
   }
   .okButton{
-    color: #ed4d00;
+    color: #0c5078;
     font-size: 15px;
     font-weight: bold;
     padding: 0;
